@@ -13,34 +13,17 @@ namespace PokePredict.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class PokemonController : ControllerBase
     {
         PokeApiNet.PokeApiClient client = new PokeApiNet.PokeApiClient();
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<PokemonController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public PokemonController(ILogger<PokemonController> logger)
         {
             _logger = logger;
         }
-
-        [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
-        }
-                [HttpGet("/test")]
+        [HttpGet("/test")]
         public IEnumerable<int> Test()
         {
             var myStack = new ConcurrentStack<int>();

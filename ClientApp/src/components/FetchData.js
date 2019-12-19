@@ -1,5 +1,15 @@
 import React, { Component } from 'react';
 
+function findCorrectName(move) {
+  let correctName = "defaultName";
+  move.names.forEach(name => {
+    if (name.language.name === "en") {
+      correctName = name.name;
+    }
+  })
+  return correctName;
+}
+
 export class FetchData extends Component {
   static displayName = FetchData.name;
 
@@ -12,24 +22,24 @@ export class FetchData extends Component {
     this.populateWeatherData();
   }
 
-  static renderForecastsTable(forecasts) {
+  static renderForecastsTable(moves) {
     return (
       <table className='table table-striped' aria-labelledby="tabelLabel">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
+            <th>Name</th>
+            <th>Power</th>
+            <th>Accuracy</th>
+            <th>Name</th>
           </tr>
         </thead>
         <tbody>
-          {forecasts.map(forecast =>
-            <tr key={forecast.date}>
-              <td>{forecast.date}</td>
-              <td>{forecast.temperatureC}</td>
-              <td>{forecast.temperatureF}</td>
-              <td>{forecast.summary}</td>
+          {moves.map(move =>
+            <tr key={move.name}>
+              <td>{findCorrectName(move)}</td>
+              <td>{move.power}</td>
+              <td>{move.accuracy}</td>
+              <td>{move.type.name}</td>
             </tr>
           )}
         </tbody>
@@ -52,7 +62,7 @@ export class FetchData extends Component {
   }
 
   async populateWeatherData() {
-    const response = await fetch('weatherforecast');
+    const response = await fetch('pokemon?pokemon=pikachu');
     const data = await response.json();
     this.setState({ forecasts: data, loading: false });
   }
