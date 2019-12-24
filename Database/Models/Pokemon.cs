@@ -14,10 +14,12 @@ namespace PokePredict.Database.Models
             var fullMoves = client.GetResourceAsync(fromMon.Moves.Select(move => move.Move));
             var fullTypes = client.GetResourceAsync(fromMon.Types.Select(type => type.Type));
             var fullStats = client.GetResourceAsync(fromMon.Stats.Select(stat => stat.Stat));
-            
+
             fullStats.Wait();
-            for(var i = 0; i < fullStats.Result.Count; i++) {
-                Stats.Add(new Stat {
+            for (var i = 0; i < fullStats.Result.Count; i++)
+            {
+                Stats.Add(new Stat
+                {
                     Effort = fromMon.Stats[i].Effort,
                     BaseStat = fromMon.Stats[i].BaseStat,
                     Name = fullStats.Result[i].Name
