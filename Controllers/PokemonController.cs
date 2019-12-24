@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -42,11 +41,9 @@ namespace PokePredict.Controllers
             }
             try
             {
-                var fullmon = await client.GetResourceAsync<Pokemon>(mon);
-                var allMoves = await client.GetResourceAsync(
-                    fullmon.Moves.Select(move => move.Move)
-                );
-                return Ok(allMoves);
+                var fullMon = await client.GetResourceAsync<Pokemon>(mon);
+                var myMon = new PokePredict.Database.Models.Pokemon(fullMon);
+                return Ok(myMon);
             }
             catch (HttpRequestException)
             {
