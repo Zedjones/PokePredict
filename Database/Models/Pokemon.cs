@@ -34,9 +34,13 @@ namespace PokePredict.Database.Models
             Moves = myMoves.ToList();
 
             fullTypes.Wait();
-            Types = fullTypes.Result;
+            Types = fullTypes.Result.Select(type => new Type(type)).ToList();
 
             Weight = fromMon.Weight;
+        }
+
+        public Pokemon()
+        {
         }
     }
     public class Stat
@@ -44,5 +48,8 @@ namespace PokePredict.Database.Models
         public int Effort { get; set; }
         public int BaseStat { get; set; }
         public string Name { get; set; }
+        public Stat()
+        {
+        }
     }
 }

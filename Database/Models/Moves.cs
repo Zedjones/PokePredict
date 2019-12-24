@@ -6,7 +6,7 @@ namespace PokePredict.Database.Models
 {
     public class Move
     {
-        public List<Type> Types { get; set; }
+        public string Type { get; set; }
         public string Name { get; set; }
         public List<Names> Names { get; set; }
         public int? Power { get; set; }
@@ -23,22 +23,32 @@ namespace PokePredict.Database.Models
             Accuracy = fromMove.Accuracy;
             Priority = fromMove.Priority;
             Target = fromMove.Target.Name;
+
             var changes = fromMove.StatChanges.Select(statChange => new StatChange(statChange));
             StatChanges = changes.ToList();
+
+            Type = fromMove.Type.Name;
+        }
+
+        public Move()
+        {
         }
     }
     public class StatChange
     {
         public int Change { get; set; }
-        public PokeApiNet.Models.Stat Stat { get; set; }
+        public string Name { get; set; }
         public StatChange(MoveStatChange statChange)
         {
             var client = new PokeApiNet.PokeApiClient();
             var statTask = client.GetResourceAsync(statChange.Stat);
             Change = statChange.Change;
             statTask.Wait();
-            Stat = statTask.Result;
+            Name = statTask.Result.Name;
         }
 
+        public StatChange()
+        {
+        }
     }
 }
