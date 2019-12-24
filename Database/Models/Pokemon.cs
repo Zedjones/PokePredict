@@ -6,10 +6,13 @@ namespace PokePredict.Database.Models
 {
     public class Pokemon
     {
+        public List<Stat> Stats { get; set; } = new List<Stat>();
+        public List<Type> Types { get; set; }
+        public List<Move> Moves { get; set; }
+        public int Weight { get; set; }
         public Pokemon(PokeApiNet.Models.Pokemon fromMon)
         {
             var client = new PokeApiNet.PokeApiClient();
-            Stats = new List<Stat>();
 
             var fullMoves = client.GetResourceAsync(fromMon.Moves.Select(move => move.Move));
             var fullTypes = client.GetResourceAsync(fromMon.Types.Select(type => type.Type));
@@ -35,11 +38,6 @@ namespace PokePredict.Database.Models
 
             Weight = fromMon.Weight;
         }
-
-        public List<Stat> Stats { get; set; }
-        public List<Type> Types { get; set; }
-        public List<Move> Moves { get; set; }
-        public int Weight { get; set; }
     }
     public class Stat
     {
