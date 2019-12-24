@@ -1,59 +1,86 @@
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PokePredict.Database.Models
 {
     public class Type
     {
         public string Name { get; set; }
-        public TypeRelations DamageRelations { get; set; }
+        public List<DamageRelation> DamageTo { get; set; } = new List<DamageRelation>();
+        public List<DamageRelation> DamageFrom { get; set; } = new List<DamageRelation>();
         public Type(PokeApiNet.Models.Type fromType)
         {
+            var client = new PokeApiNet.PokeApiClient();
             Name = fromType.Name;
-            DamageRelations = new TypeRelations(fromType.DamageRelations);
+            var halfDamageTo = client.GetResourceAsync(fromType.DamageRelations.HalfDamageTo);
+            var doubleDamageTo = client.GetResourceAsync(fromType.DamageRelations.DoubleDamageTo);
+            var noDamageTo = client.GetResourceAsync(fromType.DamageRelations.NoDamageTo);
+            var halfDamageFrom = client.GetResourceAsync(fromType.DamageRelations.HalfDamageFrom);
+            var doubleDamageFrom = client.GetResourceAsync(fromType.DamageRelations.DoubleDamageFrom);
+            var noDamageFrom = client.GetResourceAsync(fromType.DamageRelations.NoDamageFrom);
+
+            halfDamageTo.Wait();
+            halfDamageTo.Result.ForEach(type => DamageTo.Add(new DamageRelation
+            {
+                SourceType = fromType.Name,
+                TargetType = type.Name,
+                DamageMultiplier = .5f
+            }));
+
+            doubleDamageTo.Wait();
+            doubleDamageTo.Result.ForEach(type => DamageTo.Add(new DamageRelation
+            {
+                SourceType = fromType.Name,
+                TargetType = type.Name,
+                DamageMultiplier = 2f
+            }));
+
+            noDamageTo.Wait();
+            noDamageTo.Result.ForEach(type => DamageTo.Add(new DamageRelation
+            {
+                SourceType = fromType.Name,
+                TargetType = type.Name,
+                DamageMultiplier = 0f
+            }));
+
+            halfDamageFrom.Wait();
+            halfDamageFrom.Result.ForEach(type => DamageFrom.Add(new DamageRelation
+            {
+                SourceType = fromType.Name,
+                TargetType = type.Name,
+                DamageMultiplier = .5f
+            }));
+
+            doubleDamageFrom.Wait();
+            doubleDamageFrom.Result.ForEach(type => DamageFrom.Add(new DamageRelation
+            {
+                SourceType = fromType.Name,
+                TargetType = type.Name,
+                DamageMultiplier = 2f
+            }));
+
+            noDamageFrom.Wait();
+            noDamageFrom.Result.ForEach(type => DamageFrom.Add(new DamageRelation
+            {
+                SourceType = fromType.Name,
+                TargetType = type.Name,
+                DamageMultiplier = 0f
+            }));
         }
         public Type()
         {
         }
     }
-    public class TypeRelations
+    public class DamageRelation
     {
-
-        public List<string> HalfDamageTo { get; set; } = new List<string>();
-        public List<string> DoubleDamageTo { get; set; } = new List<string>();
-        public List<string> NoDamageTo { get; set; } = new List<string>();
-        public List<string> HalfDamageFrom { get; set; } = new List<string>();
-        public List<string> DoubleDamageFrom { get; set; } = new List<string>();
-        public List<string> NoDamageFrom { get; set; } = new List<string>();
-        public TypeRelations(PokeApiNet.Models.TypeRelations fromRelations)
-        {
-            var client = new PokeApiNet.PokeApiClient();
-            var halfDamageTo = client.GetResourceAsync(fromRelations.HalfDamageTo);
-            var doubleDamageTo = client.GetResourceAsync(fromRelations.DoubleDamageTo);
-            var noDamageTo = client.GetResourceAsync(fromRelations.NoDamageTo);
-            var halfDamageFrom = client.GetResourceAsync(fromRelations.HalfDamageFrom);
-            var doubleDamageFrom = client.GetResourceAsync(fromRelations.DoubleDamageFrom);
-            var noDamageFrom = client.GetResourceAsync(fromRelations.NoDamageFrom);
-
-            halfDamageTo.Wait();
-            halfDamageTo.Result.ForEach(type => HalfDamageTo.Add(type.Name));
-
-            doubleDamageTo.Wait();
-            doubleDamageTo.Result.ForEach(type => DoubleDamageTo.Add(type.Name));
-
-            noDamageTo.Wait();
-            noDamageTo.Result.ForEach(type => NoDamageTo.Add(type.Name));
-
-            halfDamageFrom.Wait();
-            halfDamageFrom.Result.ForEach(type => HalfDamageFrom.Add(type.Name));
-
-            doubleDamageFrom.Wait();
-            doubleDamageFrom.Result.ForEach(type => DoubleDamageFrom.Add(type.Name));
-
-            noDamageFrom.Wait();
-            noDamageFrom.Result.ForEach(type => NoDamageFrom.Add(type.Name));
-        }
-        public TypeRelations()
+        [Key, Column(Order = 0)]
+        public string SourceType { get; set; }
+        [Key, Column(Order = 1)]
+        public string TargetType { get; set; }
+        [Key, Column(Order = 2)]
+        public float DamageMultiplier { get; set; }
+        public DamageRelation()
         {
         }
     }

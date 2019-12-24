@@ -8,7 +8,6 @@ namespace PokePredict.Database.Models
     {
         public string Type { get; set; }
         public string Name { get; set; }
-        public List<Names> Names { get; set; }
         public int? Power { get; set; }
         public int? Accuracy { get; set; }
         public int Priority { get; set; }
@@ -18,13 +17,12 @@ namespace PokePredict.Database.Models
         {
             var client = new PokeApiNet.PokeApiClient();
             Name = fromMove.Name;
-            Names = fromMove.Names;
             Power = fromMove.Power;
             Accuracy = fromMove.Accuracy;
             Priority = fromMove.Priority;
             Target = fromMove.Target.Name;
 
-            var changes = fromMove.StatChanges.Select(statChange => new StatChange(statChange));
+            var changes = fromMove.StatChanges.Select(statChange => new StatChange(statChange, fromMove.Name));
             StatChanges = changes.ToList();
 
             Type = fromMove.Type.Name;
@@ -36,17 +34,18 @@ namespace PokePredict.Database.Models
     }
     public class StatChange
     {
+        public string MoveName { get; set; }
         public int Change { get; set; }
         public string Name { get; set; }
-        public StatChange(MoveStatChange statChange)
+        public StatChange(MoveStatChange statChange, string moveName)
         {
             var client = new PokeApiNet.PokeApiClient();
             var statTask = client.GetResourceAsync(statChange.Stat);
             Change = statChange.Change;
             statTask.Wait();
             Name = statTask.Result.Name;
+            MoveName = moveName;
         }
-
         public StatChange()
         {
         }

@@ -6,6 +6,7 @@ namespace PokePredict.Database.Models
 {
     public class Pokemon
     {
+        public string Name { get; set; }
         public List<Stat> Stats { get; set; } = new List<Stat>();
         public List<Type> Types { get; set; }
         public List<Move> Moves { get; set; }
@@ -23,6 +24,7 @@ namespace PokePredict.Database.Models
             {
                 Stats.Add(new Stat
                 {
+                    PokeName = fromMon.Name,
                     Effort = fromMon.Stats[i].Effort,
                     BaseStat = fromMon.Stats[i].BaseStat,
                     Name = fullStats.Result[i].Name
@@ -37,6 +39,7 @@ namespace PokePredict.Database.Models
             Types = fullTypes.Result.Select(type => new Type(type)).ToList();
 
             Weight = fromMon.Weight;
+            Name = fromMon.Name;
         }
 
         public Pokemon()
@@ -45,6 +48,7 @@ namespace PokePredict.Database.Models
     }
     public class Stat
     {
+        public string PokeName { get; set; }
         public int Effort { get; set; }
         public int BaseStat { get; set; }
         public string Name { get; set; }
