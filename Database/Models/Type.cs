@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PokePredict.Database.Models
 {
@@ -74,11 +72,8 @@ namespace PokePredict.Database.Models
     }
     public class DamageRelation
     {
-        [Key, Column(Order = 0)]
         public string SourceType { get; set; }
-        [Key, Column(Order = 1)]
         public string TargetType { get; set; }
-        [Key, Column(Order = 2)]
         public float DamageMultiplier { get; set; }
         public DamageRelation()
         {

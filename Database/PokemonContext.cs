@@ -11,6 +11,7 @@ namespace PokePredict.Database
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options.UseSqlite("Data Source=pokemon.db");
+            options.EnableSensitiveDataLogging();
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {

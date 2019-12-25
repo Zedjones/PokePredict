@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
+using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 using PokeApiNet.Models;
 
@@ -21,16 +21,6 @@ namespace PokePredict.Controllers
         {
             _logger = logger;
         }
-        [HttpGet("/test")]
-        public IEnumerable<int> Test()
-        {
-            var myStack = new ConcurrentStack<int>();
-            Parallel.For(0, 100, i =>
-            {
-                myStack.Push(i);
-            });
-            return myStack.ToArray();
-        }
         [HttpGet("/pokemon")]
         public async Task<IActionResult> Pokemon()
         {
@@ -43,6 +33,10 @@ namespace PokePredict.Controllers
             {
                 var fullMon = await client.GetResourceAsync<Pokemon>(mon);
                 var myMon = new PokePredict.Database.Models.Pokemon(fullMon);
+                var monStr = JsonConvert.SerializeObject(myMon);
+                var path = System.IO.Path.Combine("PokemonFiles", myMon.Name + ".json");
+                System.IO.File.WriteAllText(path, monStr);
+                var readIn = JsonConvert.DeserializeObject<PokePredict.Database.Models.Pokemon>(monStr);
                 return Ok(myMon);
             }
             catch (HttpRequestException)
