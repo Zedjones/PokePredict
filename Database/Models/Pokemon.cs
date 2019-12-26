@@ -1,6 +1,10 @@
-using PokeApiNet.Models;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using System.IO;
 using System.Linq;
+
+using Newtonsoft.Json;
 
 namespace PokePredict.Database.Models
 {
@@ -8,15 +12,16 @@ namespace PokePredict.Database.Models
     {
         public string Name { get; set; }
         public List<Stat> Stats { get; set; } = new List<Stat>();
-        public List<Type> Types { get; set; }
+        public List<string> Types { get; set; }
         public List<Move> Moves { get; set; }
         public int Weight { get; set; }
-        public Pokemon(PokeApiNet.Models.Pokemon fromMon)
+        private string WritePath;
+        public Pokemon(PokeApiNet.Models.Pokemon fromMon, string basePath)
         {
             var client = new PokeApiNet.PokeApiClient();
+            WritePath = Path.Combine(basePath, "Pokemon", fromMon.Name + ".json");
 
             var fullMoves = client.GetResourceAsync(fromMon.Moves.Select(move => move.Move));
-            var fullTypes = client.GetResourceAsync(fromMon.Types.Select(type => type.Type));
             var fullStats = client.GetResourceAsync(fromMon.Stats.Select(stat => stat.Stat));
 
             fullStats.Wait();
@@ -24,7 +29,6 @@ namespace PokePredict.Database.Models
             {
                 Stats.Add(new Stat
                 {
-                    PokeName = fromMon.Name,
                     Effort = fromMon.Stats[i].Effort,
                     BaseStat = fromMon.Stats[i].BaseStat,
                     Name = fullStats.Result[i].Name
@@ -32,28 +36,35 @@ namespace PokePredict.Database.Models
             }
 
             fullMoves.Wait();
-            var myMoves = fullMoves.Result.Select(fullMove => new Move(fullMove));
+
+            var myMoves = new ConcurrentStack<Move>();
+            Parallel.ForEach(fullMoves.Result, fullMove => {
+                var moveTask = new Move(fullMove, basePath);
+                myMoves.Push(moveTask);
+            });
             Moves = myMoves.ToList();
 
-            fullTypes.Wait();
-            Types = fullTypes.Result.Select(type => new Type(type)).ToList();
+            Types = fromMon.Types.Select(type => type.Type.Name).ToList();
 
             Weight = fromMon.Weight;
             Name = fromMon.Name;
         }
 
-        public Pokemon()
+        public void WriteOut()
         {
+            var dirName = Path.GetDirectoryName(WritePath);
+            if (!Directory.Exists(dirName))
+            {
+                Directory.CreateDirectory(dirName);
+            }
+            var monStr = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(WritePath, monStr);
         }
     }
     public class Stat
     {
-        public string PokeName { get; set; }
         public int Effort { get; set; }
         public int BaseStat { get; set; }
         public string Name { get; set; }
-        public Stat()
-        {
-        }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using Newtonsoft.Json;
 
 using PokeApiNet.Models;
@@ -13,7 +14,8 @@ namespace PokePredict.Controllers
     [Route("[controller]")]
     public class PokemonController : ControllerBase
     {
-        PokeApiNet.PokeApiClient client = new PokeApiNet.PokeApiClient();
+        const string DataPath = "PokemonFiles";
+        PokeApiNet.PokeApiClient Client = new PokeApiNet.PokeApiClient();
 
         private readonly ILogger<PokemonController> _logger;
 
@@ -31,12 +33,18 @@ namespace PokePredict.Controllers
             }
             try
             {
-                var fullMon = await client.GetResourceAsync<Pokemon>(mon);
-                var myMon = new PokePredict.Database.Models.Pokemon(fullMon);
-                var monStr = JsonConvert.SerializeObject(myMon);
-                var path = System.IO.Path.Combine("PokemonFiles", myMon.Name + ".json");
-                System.IO.File.WriteAllText(path, monStr);
-                var readIn = JsonConvert.DeserializeObject<PokePredict.Database.Models.Pokemon>(monStr);
+                var watch = new Stopwatch();
+                watch.Start();
+                var fullMon = await Client.GetResourceAsync<Pokemon>(mon);
+                _logger.LogInformation(watch.Elapsed.ToString());
+                //var types = await Client.GetNamedResourcePageAsync<Type>(int.MaxValue, 0);
+                //var allTypes = await Client.GetResourceAsync(types.Results);
+                //var myTypes = allTypes.Select(myType => new PokePredict.Database.Models.Type(myType, DataPath)).ToList();
+                //myTypes.ForEach(type => type.WriteOut());
+                var myMon = new PokePredict.Database.Models.Pokemon(fullMon, DataPath);
+                //var myMon = await PokePredict.Database.Models.Pokemon.FromNetMon(fullMon, DataPath);
+                _logger.LogInformation(watch.Elapsed.ToString());
+                //myMon.WriteOut();
                 return Ok(myMon);
             }
             catch (HttpRequestException)

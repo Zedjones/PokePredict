@@ -16,12 +16,12 @@ namespace PokePredict.Database
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<DamageRelation>().HasKey(dr =>
-                new { dr.SourceType, dr.TargetType, dr.DamageMultiplier }
+                new { dr.TargetType, dr.DamageMultiplier }
             );
             builder.Entity<Move>().HasKey(move => new { move.Name });
             builder.Entity<Pokemon>().HasKey(mon => new { mon.Name });
-            builder.Entity<Stat>().HasKey(stat => new { stat.Name, stat.PokeName });
-            builder.Entity<StatChange>().HasKey(statChange => new { statChange.Name, statChange.MoveName });
+            builder.Entity<Stat>().HasKey(stat => new { stat.Name });
+            builder.Entity<StatChange>().HasKey(statChange => new { statChange.Name });
             builder.Entity<Type>().HasKey(type => new { type.Name });
         }
     }
