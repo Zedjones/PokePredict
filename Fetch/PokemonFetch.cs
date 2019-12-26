@@ -1,4 +1,5 @@
 using PokeApiNet.Models;
+using System.Threading.Tasks;
 using System.Linq;
 
 namespace PokePredict.Fetch
@@ -11,11 +12,14 @@ namespace PokePredict.Fetch
             var detailedMons = await Client.GetResourceAsync(allMons.Results);
             System.Diagnostics.Debug.WriteLine(allMons.Count);
         }
-        public async void CacheAllTypes(string previousPath) {
-            var types = await Client.GetNamedResourcePageAsync<Type>(int.MaxValue, 0);
-            var allTypes = await Client.GetResourceAsync(types.Results);
-            var myTypes = allTypes.Select(myType => new PokePredict.Database.Models.Type(myType, previousPath)).ToList();
-            myTypes.ForEach(type => type.WriteOut());
+        public static async Task CacheAllTypes(string previousPath) {
+            var client = new PokeApiNet.PokeApiClient();
+            var types = await client.GetNamedResourcePageAsync<Type>(int.MaxValue, 0);
+            var allTypes = await client.GetResourceAsync(types.Results);
+            Parallel.ForEach(allTypes, myType => {
+                var fullType = new PokePredict.Database.Models.Type(myType, previousPath);
+                fullType.WriteOut();
+            });
         }
     }
 }

@@ -37,14 +37,8 @@ namespace PokePredict.Controllers
                 watch.Start();
                 var fullMon = await Client.GetResourceAsync<Pokemon>(mon);
                 _logger.LogInformation(watch.Elapsed.ToString());
-                //var types = await Client.GetNamedResourcePageAsync<Type>(int.MaxValue, 0);
-                //var allTypes = await Client.GetResourceAsync(types.Results);
-                //var myTypes = allTypes.Select(myType => new PokePredict.Database.Models.Type(myType, DataPath)).ToList();
-                //myTypes.ForEach(type => type.WriteOut());
                 var myMon = new PokePredict.Database.Models.Pokemon(fullMon, DataPath);
-                //var myMon = await PokePredict.Database.Models.Pokemon.FromNetMon(fullMon, DataPath);
                 _logger.LogInformation(watch.Elapsed.ToString());
-                //myMon.WriteOut();
                 return Ok(myMon);
             }
             catch (HttpRequestException)
