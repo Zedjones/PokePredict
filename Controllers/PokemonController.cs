@@ -39,6 +39,7 @@ namespace PokePredict.Controllers
                 _logger.LogInformation(watch.Elapsed.ToString());
                 var myMon = new PokePredict.Database.Models.Pokemon(fullMon, DataPath);
                 _logger.LogInformation(watch.Elapsed.ToString());
+                myMon.WriteOut();
                 return Ok(myMon);
             }
             catch (HttpRequestException)
