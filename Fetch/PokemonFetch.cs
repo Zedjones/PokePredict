@@ -1,25 +1,34 @@
 using PokeApiNet.Models;
 using System.Threading.Tasks;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace PokePredict.Fetch
 {
     public class PokemonFetch
     {
-        PokeApiNet.PokeApiClient Client = new PokeApiNet.PokeApiClient();
-        public async void CacheAllPokemon() {
-            var allMons = await Client.GetNamedResourcePageAsync<Pokemon>(1000, 0);
-            var detailedMons = await Client.GetResourceAsync(allMons.Results);
+        private static async Task CacheAllPokemon(PokeApiNet.PokeApiClient client, string previousPath) {
+            var allMons = await client.GetNamedResourcePageAsync<Pokemon>(1000, 0);
+            var detailedMons = await client.GetResourceAsync(allMons.Results);
+            Parallel.ForEach(detailedMons, myMons => {
+                var fullMon = new PokePredict.Database.Models.Pokemon(myMons, previousPath);
+                fullMon.WriteOut();
+            });
             System.Diagnostics.Debug.WriteLine(allMons.Count);
         }
-        public static async Task CacheAllTypes(string previousPath) {
-            var client = new PokeApiNet.PokeApiClient();
+        private static async Task CacheAllTypes(PokeApiNet.PokeApiClient client, string previousPath) {
             var types = await client.GetNamedResourcePageAsync<Type>(int.MaxValue, 0);
             var allTypes = await client.GetResourceAsync(types.Results);
             Parallel.ForEach(allTypes, myType => {
                 var fullType = new PokePredict.Database.Models.Type(myType, previousPath);
                 fullType.WriteOut();
             });
+        }
+        public static void CacheAll(string previousPath) {
+            var client = new PokeApiNet.PokeApiClient();
+            var tasks = new List<Task>();
+            tasks.Add(PokemonFetch.CacheAllTypes(client, previousPath));
+            tasks.Add(PokemonFetch.CacheAllPokemon(client, previousPath));
+            Task.WhenAll(tasks);
         }
     }
 }
