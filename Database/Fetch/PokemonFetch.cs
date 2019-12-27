@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 
-namespace PokePredict.Fetch
+namespace PokePredict.Database.Fetch
 {
     public class PokemonFetch
     {
@@ -35,7 +35,7 @@ namespace PokePredict.Fetch
         public static void CacheAll(string basePath) {
             var client = new PokeApiNet.PokeApiClient();
             var tasks = new List<Task>();
-            //tasks.Add(PokemonFetch.CacheAllPokemon(client, basePath));
+            tasks.Add(PokemonFetch.CacheAllPokemon(client, basePath));
             tasks.Add(PokemonFetch.CacheAllTypes(client, basePath));
             Task.WhenAll(tasks);
         }

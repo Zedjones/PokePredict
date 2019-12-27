@@ -7,4 +7,8 @@
     <ToolCommandName>pokefetch</ToolCommandName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="PokeApiNet" Version="2.0.0" />
+  </ItemGroup>
+
 </Project>
