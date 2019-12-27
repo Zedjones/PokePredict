@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using PokePredict.Fetch;
 
 namespace PokePredict
 {
@@ -7,6 +8,7 @@ namespace PokePredict
     {
         public static void Main(string[] args)
         {
+            PokemonFetch.CacheAll("PokemonFiles");
             CreateHostBuilder(args).Build().Run();
         }
 

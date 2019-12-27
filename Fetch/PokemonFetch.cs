@@ -11,6 +11,7 @@ namespace PokePredict.Fetch
             var allMons = await client.GetNamedResourcePageAsync<Pokemon>(int.MaxValue, 0);
             var pokePath = Path.Join(previousPath, "Pokemon");
             // If we already have all the Pokemon, return
+            // TODO: Filter out Pokemon that we already have the files for
             if(new DirectoryInfo(pokePath).GetFiles().Length == allMons.Count) return;
             var detailedMons = await client.GetResourceAsync(allMons.Results);
             Parallel.ForEach(detailedMons, myMons => {
@@ -23,6 +24,7 @@ namespace PokePredict.Fetch
             var types = await client.GetNamedResourcePageAsync<Type>(int.MaxValue, 0);
             var typePath = Path.Join(previousPath, "Types");
             // If we already have all the types, return
+            // TODO: Filter out types that we already have the files for
             if(new DirectoryInfo(typePath).GetFiles().Length == types.Count) return;
             var allTypes = await client.GetResourceAsync(types.Results);
             Parallel.ForEach(allTypes, myType => {
@@ -33,7 +35,7 @@ namespace PokePredict.Fetch
         public static void CacheAll(string basePath) {
             var client = new PokeApiNet.PokeApiClient();
             var tasks = new List<Task>();
-            tasks.Add(PokemonFetch.CacheAllPokemon(client, basePath));
+            //tasks.Add(PokemonFetch.CacheAllPokemon(client, basePath));
             tasks.Add(PokemonFetch.CacheAllTypes(client, basePath));
             Task.WhenAll(tasks);
         }
