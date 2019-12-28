@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using PokePredict.Database.Fetch;
+using PokeFetch;
 
 namespace Database
 {
@@ -10,7 +10,6 @@ namespace Database
         {
             var basePath = Path.Combine("..", "PokemonFiles");
             PokemonFetch.CacheAll(basePath);
-            Console.WriteLine("Hello World!");
         }
     }
 }
