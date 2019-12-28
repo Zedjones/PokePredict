@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using PokePredict.Database.Models;
 
 using PokeApiNet.Models;
 
@@ -15,8 +16,6 @@ namespace PokePredict.Controllers
     public class PokemonController : ControllerBase
     {
         const string DataPath = "PokemonFiles";
-        PokeApiNet.PokeApiClient Client = new PokeApiNet.PokeApiClient();
-
         private readonly ILogger<PokemonController> _logger;
 
         public PokemonController(ILogger<PokemonController> logger)
@@ -24,7 +23,7 @@ namespace PokePredict.Controllers
             _logger = logger;
         }
         [HttpGet("/pokemon")]
-        public async Task<IActionResult> Pokemon()
+        public IActionResult Pokemon()
         {
             var mon = Request.Query["pokemon"];
             if (mon.Count == 0)
@@ -34,13 +33,11 @@ namespace PokePredict.Controllers
             try
             {
                 var watch = new Stopwatch();
-                watch.Start();
-                var fullMon = await Client.GetResourceAsync<Pokemon>(mon);
-                _logger.LogInformation(watch.Elapsed.ToString());
-                var myMon = new PokePredict.Database.Models.Pokemon(fullMon, DataPath);
-                _logger.LogInformation(watch.Elapsed.ToString());
-                myMon.WriteOut();
-                return Ok(myMon);
+                using (var db = new pokedexContext())
+                {
+                    var fullMon = db.Pokemon.First();
+                    return Ok(JsonConvert.SerializeObject(fullMon.Species));
+                }
             }
             catch (HttpRequestException)
             {

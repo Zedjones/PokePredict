@@ -1,44 +1,67 @@
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using PokeApiNet.Models;
 
 namespace PokePredict.Database.Models
 {
-    public class Move
+    public partial class Moves
     {
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public int? Power { get; set; }
-        public int? Accuracy { get; set; }
-        public int Priority { get; set; }
-        public List<StatChange> StatChanges { get; set; }
-        public string Target { get; set; }
-        public Move(PokeApiNet.Models.Move fromMove, string precedingPath)
+        public Moves()
         {
-            var client = new PokeApiNet.PokeApiClient();
-            Name = fromMove.Name;
-            Power = fromMove.Power;
-            Accuracy = fromMove.Accuracy;
-            Priority = fromMove.Priority;
-            Target = fromMove.Target.Name;
-
-            var changes = fromMove.StatChanges.Select(statChange => new StatChange(statChange));
-            StatChanges = changes.ToList();
-
-            Type = fromMove.Type.Name;
+            ConquestPokemonMoves = new HashSet<ConquestPokemonMoves>();
+            ContestCombosFirstMove = new HashSet<ContestCombos>();
+            ContestCombosSecondMove = new HashSet<ContestCombos>();
+            Machines = new HashSet<Machines>();
+            MoveChangelog = new HashSet<MoveChangelog>();
+            MoveFlagMap = new HashSet<MoveFlagMap>();
+            MoveFlavorSummaries = new HashSet<MoveFlavorSummaries>();
+            MoveFlavorText = new HashSet<MoveFlavorText>();
+            MoveMetaStatChanges = new HashSet<MoveMetaStatChanges>();
+            MoveNames = new HashSet<MoveNames>();
+            PokemonEvolution = new HashSet<PokemonEvolution>();
+            PokemonMoves = new HashSet<PokemonMoves>();
+            SuperContestCombosFirstMove = new HashSet<SuperContestCombos>();
+            SuperContestCombosSecondMove = new HashSet<SuperContestCombos>();
         }
-    }
-    public class StatChange
-    {
-        public int Change { get; set; }
-        public string Name { get; set; }
-        public StatChange(MoveStatChange statChange)
-        {
-            var client = new PokeApiNet.PokeApiClient();
-            var statTask = client.GetResourceAsync(statChange.Stat);
-            Change = statChange.Change;
-            statTask.Wait();
-            Name = statTask.Result.Name;
-        }
+
+        public long Id { get; set; }
+        public string Identifier { get; set; }
+        public long GenerationId { get; set; }
+        public long TypeId { get; set; }
+        public long? Power { get; set; }
+        public long? Pp { get; set; }
+        public long? Accuracy { get; set; }
+        public long Priority { get; set; }
+        public long TargetId { get; set; }
+        public long DamageClassId { get; set; }
+        public long EffectId { get; set; }
+        public long? EffectChance { get; set; }
+        public long? ContestTypeId { get; set; }
+        public long? ContestEffectId { get; set; }
+        public long? SuperContestEffectId { get; set; }
+
+        public virtual ContestEffects ContestEffect { get; set; }
+        public virtual ContestTypes ContestType { get; set; }
+        public virtual MoveDamageClasses DamageClass { get; set; }
+        public virtual MoveEffects Effect { get; set; }
+        public virtual Generations Generation { get; set; }
+        public virtual SuperContestEffects SuperContestEffect { get; set; }
+        public virtual MoveTargets Target { get; set; }
+        public virtual Types Type { get; set; }
+        public virtual ConquestMoveData ConquestMoveData { get; set; }
+        public virtual MoveMeta MoveMeta { get; set; }
+        public virtual ICollection<ConquestPokemonMoves> ConquestPokemonMoves { get; set; }
+        public virtual ICollection<ContestCombos> ContestCombosFirstMove { get; set; }
+        public virtual ICollection<ContestCombos> ContestCombosSecondMove { get; set; }
+        public virtual ICollection<Machines> Machines { get; set; }
+        public virtual ICollection<MoveChangelog> MoveChangelog { get; set; }
+        public virtual ICollection<MoveFlagMap> MoveFlagMap { get; set; }
+        public virtual ICollection<MoveFlavorSummaries> MoveFlavorSummaries { get; set; }
+        public virtual ICollection<MoveFlavorText> MoveFlavorText { get; set; }
+        public virtual ICollection<MoveMetaStatChanges> MoveMetaStatChanges { get; set; }
+        public virtual ICollection<MoveNames> MoveNames { get; set; }
+        public virtual ICollection<PokemonEvolution> PokemonEvolution { get; set; }
+        public virtual ICollection<PokemonMoves> PokemonMoves { get; set; }
+        public virtual ICollection<SuperContestCombos> SuperContestCombosFirstMove { get; set; }
+        public virtual ICollection<SuperContestCombos> SuperContestCombosSecondMove { get; set; }
     }
 }
