@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PokePredict.Database.Models
 {
@@ -26,6 +27,7 @@ namespace PokePredict.Database.Models
         public virtual ICollection<MoveMetaStatChanges> MoveMetaStatChanges { get; set; }
         public virtual ICollection<Natures> NaturesDecreasedStat { get; set; }
         public virtual ICollection<Natures> NaturesIncreasedStat { get; set; }
+        [JsonIgnore]
         public virtual ICollection<PokemonStats> PokemonStats { get; set; }
         public virtual ICollection<StatNames> StatNames { get; set; }
     }

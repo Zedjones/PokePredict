@@ -1,13 +1,11 @@
 ﻿using System.Net.Http;
-using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using PokePredict.Database.Models;
-
-using PokeApiNet.Models;
 
 namespace PokePredict.Controllers
 {
@@ -33,10 +31,16 @@ namespace PokePredict.Controllers
             try
             {
                 var watch = new Stopwatch();
+                watch.Start();
                 using (var db = new pokedexContext())
                 {
-                    var fullMon = db.Pokemon.First();
-                    return Ok(JsonConvert.SerializeObject(fullMon.Species));
+                    var fullMon = db.Pokemon
+                        .Include(pk => pk.Species)
+                        .Include(pk => pk.PokemonStats)
+                        .ThenInclude(stat => stat.Stat)
+                        .ToList();
+                    _logger.LogInformation(watch.Elapsed.ToString());
+                    return Ok(fullMon.Select(mon => mon.PokemonStats.Select(stat => stat.Stat)));
                 }
             }
             catch (HttpRequestException)
