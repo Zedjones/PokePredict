@@ -1,11 +1,13 @@
-﻿using System.Net.Http;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using Newtonsoft.Json;
 using PokePredict.Database.Models;
+using RabbitMQ.Client;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace PokePredict.Controllers
 {
@@ -28,25 +30,42 @@ namespace PokePredict.Controllers
             {
                 return BadRequest();
             }
-            try
+            var factory = new ConnectionFactory { HostName = "localhost" };
+            var watch = new Stopwatch();
+            watch.Start();
+            List<Pokemon> fullMons;
+            using (var db = new pokedexContext())
             {
-                var watch = new Stopwatch();
-                watch.Start();
-                using (var db = new pokedexContext())
+                fullMons = db.Pokemon
+                    .Include(pk => pk.Species)
+                    .Include(pk => pk.PokemonStats)
+                    .ThenInclude(stat => stat.Stat)
+                    .Where(pk => pk.Identifier == mon[0])
+                    .ToList();
+                _logger.LogInformation(watch.Elapsed.ToString());
+            }
+            using (var connection = factory.CreateConnection())
+            {
+                using (var channel = connection.CreateModel())
                 {
-                    var fullMon = db.Pokemon
-                        .Include(pk => pk.Species)
-                        .Include(pk => pk.PokemonStats)
-                        .ThenInclude(stat => stat.Stat)
-                        .ToList();
-                    _logger.LogInformation(watch.Elapsed.ToString());
-                    return Ok(fullMon.Select(mon => mon.PokemonStats.Select(stat => stat.Stat)));
+                    channel.QueueDeclare(queue: "pokemon",
+                                         durable: false,
+                                         exclusive: false,
+                                         autoDelete: false,
+                                         arguments: null);
+
+                    var stats = fullMons.Select(mon => mon.PokemonStats);
+                    var statStr = JsonConvert.SerializeObject(stats);
+                    var body = Encoding.UTF8.GetBytes(statStr);
+
+                    channel.BasicPublish(exchange: "",
+                                         routingKey: "pokemon",
+                                         basicProperties: null,
+                                         body: body);
+                    _logger.LogInformation("Wrote Pokemon to channel");
                 }
             }
-            catch (HttpRequestException)
-            {
-                return BadRequest();
-            }
+            return Ok(fullMons.Select(mon => mon.PokemonStats));
         }
     }
 }
