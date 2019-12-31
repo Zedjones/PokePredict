@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PokePredict.Database.Models
 {
@@ -58,6 +59,7 @@ namespace PokePredict.Database.Models
         public virtual ICollection<ConquestPokemonStats> ConquestPokemonStats { get; set; }
         public virtual ICollection<ConquestTransformationPokemon> ConquestTransformationPokemon { get; set; }
         public virtual ICollection<PokemonSpecies> InverseEvolvesFromSpecies { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Pokemon> Pokemon { get; set; }
         public virtual ICollection<PokemonDexNumbers> PokemonDexNumbers { get; set; }
         public virtual ICollection<PokemonEggGroups> PokemonEggGroups { get; set; }

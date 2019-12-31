@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PokePredict.Database.Models
 {
@@ -13,6 +14,7 @@ namespace PokePredict.Database.Models
         public long? Order { get; set; }
 
         public virtual Moves Move { get; set; }
+        [JsonIgnore]
         public virtual Pokemon Pokemon { get; set; }
         public virtual PokemonMoveMethods PokemonMoveMethod { get; set; }
         public virtual VersionGroups VersionGroup { get; set; }

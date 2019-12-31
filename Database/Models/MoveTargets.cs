@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PokePredict.Database.Models
 {
@@ -17,6 +18,7 @@ namespace PokePredict.Database.Models
 
         public virtual ICollection<MoveChangelog> MoveChangelog { get; set; }
         public virtual ICollection<MoveTargetProse> MoveTargetProse { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Moves> Moves { get; set; }
     }
 }
