@@ -40,8 +40,9 @@ namespace PokePredict.Controllers
                     .Include(pk => pk.Species)
                     //Include all moves
                     .Include(pk => pk.PokemonMoves)
-                    .ThenInclude(move => move.Move)
-                    .ThenInclude(move => move.Target)
+                    .ThenInclude(move => move.Move.Target)
+                    .Include(pk => pk.PokemonMoves)
+                    .ThenInclude(move => move.Move.Type)
                     //Include all stats
                     .Include(pk => pk.PokemonStats)
                     .ThenInclude(stat => stat.Stat)

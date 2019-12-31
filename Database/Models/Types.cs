@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PokePredict.Database.Models
 {
@@ -34,6 +35,7 @@ namespace PokePredict.Database.Models
         public virtual ICollection<ConquestWarriorSpecialties> ConquestWarriorSpecialties { get; set; }
         public virtual ICollection<ConquestWarriorTransformation> ConquestWarriorTransformation { get; set; }
         public virtual ICollection<MoveChangelog> MoveChangelog { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Moves> Moves { get; set; }
         public virtual ICollection<PokemonEvolution> PokemonEvolutionKnownMoveType { get; set; }
         public virtual ICollection<PokemonEvolution> PokemonEvolutionPartyType { get; set; }
