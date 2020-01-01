@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PokePredict.Database.Models
 {
@@ -10,6 +10,7 @@ namespace PokePredict.Database.Models
         public long Slot { get; set; }
 
         public virtual Pokemon Pokemon { get; set; }
+        [JsonIgnore]
         public virtual Types Type { get; set; }
     }
 }
