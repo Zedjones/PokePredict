@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using PokePredict.Database.Models;
+using System.Threading.Tasks;
 using PokePredict.Database;
 using RabbitMQ.Client;
 using Newtonsoft.Json;
@@ -67,6 +68,24 @@ namespace PokePredict.Controllers
                 }
             }
             return Ok(monStr);
+        }
+        [HttpPost("/process")]
+        public async Task<IActionResult> ProcessTeam()
+        {
+            var jsonReader = new StreamReader(Request.Body);
+            var pokemonJson = await jsonReader.ReadToEndAsync();
+            var jsSettings = new JsonSerializerSettings();
+            jsSettings.MissingMemberHandling = MissingMemberHandling.Error;
+            try
+            {
+                var monList = JsonConvert.DeserializeObject<List<PokemonDto>>(pokemonJson, jsSettings);
+                await Predict.Prediction.PredictTeam(monList);
+                return Ok(monList);
+            }
+            catch (JsonSerializationException jse)
+            {
+                return BadRequest(jse.Message);
+            }
         }
     }
 }
