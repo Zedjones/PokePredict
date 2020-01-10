@@ -24,13 +24,18 @@ namespace PokePredict.Predict
                 teamFull = Queries.AllPokemon(db)
                     .Where(pk => team.Select(opk => opk.Name).Contains(pk.Identifier))
                     .ToList();
-                teamFull.ForEach(pk => pk.PokemonMoves = pk.PokemonMoves.Where(move =>
-                    team
-                        .Where(opk => pk.Identifier == opk.Name)
-                        .First()
-                        .Moves
-                        .Contains(move.Move.Identifier)
-                ).ToList());
+                teamFull.ForEach(pk => pk.PokemonMoves = 
+                    pk.PokemonMoves.Where(move =>
+                        team
+                            .Where(opk => pk.Identifier == opk.Name)
+                            .First()
+                            .Moves
+                            .Contains(move.Move.Identifier)
+                    )
+                    .GroupBy(move => move.Move)
+                    .Select(group => group.First())
+                    .ToList()
+                );
             }
             return teamFull;
         }
