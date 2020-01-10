@@ -33,16 +33,20 @@ namespace PokePredict.Controllers
             var factory = new ConnectionFactory { HostName = "localhost" };
             var watch = new Stopwatch();
             watch.Start();
-            List<Database.PokemonDto> fullMon;
+            Database.Models.Pokemon fullMon;
             using (var db = new pokedexContext())
             {
-                /*
                 fullMon = Queries.AllPokemon(db)
                     .Where(pk => pk.Identifier == mon[0])
                     .First();
-                */
                 _logger.LogInformation(watch.Elapsed.ToString());
             }
+
+            var jsSettings = new JsonSerializerSettings();
+            jsSettings.Formatting = Formatting.Indented;
+            jsSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            var monStr = JsonConvert.SerializeObject(fullMon, jsSettings);
+
             using (var connection = factory.CreateConnection())
             {
                 using (var channel = connection.CreateModel())
@@ -53,10 +57,6 @@ namespace PokePredict.Controllers
                                          autoDelete: false,
                                          arguments: null);
 
-                    var jsSettings = new JsonSerializerSettings();
-                    jsSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-
-                    var monStr = JsonConvert.SerializeObject(Queries.DtoList, jsSettings);
                     var body = Encoding.UTF8.GetBytes(monStr);
 
                     channel.BasicPublish(exchange: "",
@@ -66,7 +66,7 @@ namespace PokePredict.Controllers
                     _logger.LogInformation("Wrote Pokemon to channel");
                 }
             }
-            return Ok(Queries.DtoList);
+            return Ok(monStr);
         }
     }
 }
