@@ -12,22 +12,27 @@ namespace PokePredict.Predict
         {
             var timer = new Stopwatch();
             timer.Start();
-            List<PokePredict.Database.Models.Pokemon> otherTeamFull;
+            var otherTeamFull = DtoToFull(otherTeam);
+            System.Console.WriteLine(timer.Elapsed.ToString());
+            return new List<PokemonDto>();
+        }
+
+        public static List<Database.Models.Pokemon> DtoToFull(List<PokemonDto> team) {
+            List<PokePredict.Database.Models.Pokemon> teamFull;
             using (var db = new PokePredict.Database.Models.pokedexContext()) 
             {
-                otherTeamFull = Queries.AllPokemon(db)
-                    .Where(pk => otherTeam.Select(opk => opk.Name).Contains(pk.Identifier))
+                teamFull = Queries.AllPokemon(db)
+                    .Where(pk => team.Select(opk => opk.Name).Contains(pk.Identifier))
                     .ToList();
-                otherTeamFull.ForEach(pk => pk.PokemonMoves = pk.PokemonMoves.Where(move =>
-                    otherTeam
+                teamFull.ForEach(pk => pk.PokemonMoves = pk.PokemonMoves.Where(move =>
+                    team
                         .Where(opk => pk.Identifier == opk.Name)
                         .First()
                         .Moves
                         .Contains(move.Move.Identifier)
                 ).ToList());
             }
-            System.Console.WriteLine(timer.Elapsed.ToString());
-            return new List<PokemonDto>();
+            return teamFull;
         }
     }
 }

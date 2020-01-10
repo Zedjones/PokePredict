@@ -81,8 +81,8 @@ namespace PokePredict.Controllers
             try
             {
                 var monList = JsonConvert.DeserializeObject<List<PokemonDto>>(pokemonJson, jsSettings);
-                Predict.Prediction.PredictTeam(monList);
-                return Ok(monList);
+                var fullTeam = Predict.Prediction.DtoToFull(monList);
+                return Ok(fullTeam);
             }
             catch (JsonSerializationException jse)
             {
