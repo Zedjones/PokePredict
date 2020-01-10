@@ -6,6 +6,7 @@ using PokePredict.Database.Models;
 using System.Threading.Tasks;
 using PokePredict.Database;
 using RabbitMQ.Client;
+using System.Linq;
 using Newtonsoft.Json;
 using System.Text;
 using System.Collections.Generic;
@@ -41,6 +42,7 @@ namespace PokePredict.Controllers
                     .Where(pk => pk.Identifier == mon[0])
                     .First();
                 _logger.LogInformation(watch.Elapsed.ToString());
+                _logger.LogInformation(fullMon.PokemonMoves.Count.ToString());
             }
 
             var jsSettings = new JsonSerializerSettings();
@@ -79,7 +81,7 @@ namespace PokePredict.Controllers
             try
             {
                 var monList = JsonConvert.DeserializeObject<List<PokemonDto>>(pokemonJson, jsSettings);
-                await Predict.Prediction.PredictTeam(monList);
+                Predict.Prediction.PredictTeam(monList);
                 return Ok(monList);
             }
             catch (JsonSerializationException jse)

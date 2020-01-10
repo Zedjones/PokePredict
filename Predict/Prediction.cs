@@ -8,7 +8,7 @@ namespace PokePredict.Predict
 {
     public class Prediction
     {
-        public static async Task<List<PokemonDto>> PredictTeam(List<PokemonDto> otherTeam)
+        public static List<PokemonDto> PredictTeam(List<PokemonDto> otherTeam)
         {
             var timer = new Stopwatch();
             timer.Start();
