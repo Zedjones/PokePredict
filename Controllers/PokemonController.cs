@@ -41,6 +41,7 @@ namespace PokePredict.Controllers
                 fullMon = Queries.AllPokemon(db)
                     .Where(pk => pk.Identifier == mon[0])
                     .First();
+                Queries.ReduceMoves(fullMon);
                 _logger.LogInformation(watch.Elapsed.ToString());
                 _logger.LogInformation(fullMon.PokemonMoves.Count.ToString());
             }

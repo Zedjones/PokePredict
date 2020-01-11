@@ -32,10 +32,9 @@ namespace PokePredict.Predict
                             .Moves
                             .Contains(move.Move.Identifier)
                     )
-                    .GroupBy(move => move.Move)
-                    .Select(group => group.First())
                     .ToList()
                 );
+                Queries.ReduceMoves(teamFull.ToArray());
             }
             return teamFull;
         }

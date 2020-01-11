@@ -14,8 +14,9 @@ namespace PokePredict.Database
     public static class Queries
     {
         public readonly static List<PokemonDto> DtoList;
-        static Queries() {
-            using (var db = new pokedexContext()) 
+        static Queries()
+        {
+            using (var db = new pokedexContext())
             {
                 DtoList = NameAndMoves(db).ToList();
             }
@@ -36,7 +37,16 @@ namespace PokePredict.Database
                 .ThenInclude(stat => stat.Stat)
                 .Include(pk => pk.PokemonTypes);
 
-        public static Func<pokedexContext, IEnumerable<PokemonDto>> NameAndMoves =
+        public static void ReduceMoves(params Pokemon[] pokeQuery)
+        {
+            pokeQuery.ToList().ForEach(pk => pk.PokemonMoves =
+                pk.PokemonMoves
+                .GroupBy(move => move.Move)
+                .Select(group => group.First())
+                .ToList()
+            );
+        }
+        private static Func<pokedexContext, IEnumerable<PokemonDto>> NameAndMoves =
             EF.CompileQuery((pokedexContext db) => db.Pokemon
                 .Include(pk => pk.PokemonMoves)
                 .ThenInclude(move => move.Move)
