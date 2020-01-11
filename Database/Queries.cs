@@ -55,12 +55,13 @@ namespace PokePredict.Database
         /// <param name="pokeQuery">1 or more Pokemon to remove duplicate moves for</param>
         public static void ReduceMoves(params Pokemon[] pokeQuery)
         {
-            pokeQuery.ToList().ForEach(pk => pk.PokemonMoves =
-                pk.PokemonMoves
-                .GroupBy(move => move.Move)
-                .Select(group => group.First())
-                .ToList()
-            );
+            foreach (var pk in pokeQuery)
+            {
+                pk.PokemonMoves = pk.PokemonMoves
+                    .GroupBy(move => move.Move)
+                    .Select(group => group.First())
+                    .ToList();
+            }
         }
         /// <summary>
         /// Get a full list of PokemonDto objects (Pokemon names and move names)

@@ -21,27 +21,21 @@ namespace PokePredict.Predict
         /// <param name="team">A list of PokemonDto objects to convert</param>
         /// <returns>A list of Pokemon objects with only the specified moves</returns>
         public static List<Database.Models.Pokemon> DtoToFull(List<PokemonDto> team) {
-            List<PokePredict.Database.Models.Pokemon> teamFull;
+            var teamFull = new List<Database.Models.Pokemon>();
             using (var db = new PokePredict.Database.Models.pokedexContext()) 
             {
-                // Only get Pokemon that are in the team
-                teamFull = Queries.AllPokemon(db)
-                    .Where(pk => team.Select(opk => opk.Name).Contains(pk.Identifier))
-                    .ToList();
-                // Only get moves that are specified for each specific Pokemon
-                teamFull.ForEach(pk => pk.PokemonMoves = 
-                    pk.PokemonMoves.Where(move =>
-                        team
-                            .Where(opk => pk.Identifier == opk.Name)
-                            .First()
-                            .Moves
-                            .Contains(move.Move.Identifier)
-                    )
-                    .ToList()
-                );
-                // Get rid of duplicate moves with different version IDs
-                Queries.ReduceMoves(teamFull.ToArray());
+                var monQuery = Queries.AllPokemon(db);
+                team.ForEach(dtoMon => {
+                    // Get the specific Pokemon
+                    var fullMon = monQuery.Where(pk => pk.Identifier == dtoMon.Name).First();
+                    // Only get moves that are in our PokemonDto's list
+                    fullMon.PokemonMoves = fullMon.PokemonMoves
+                        .Where(move => dtoMon.Moves.Contains(move.Move.Identifier)).ToList();
+                    teamFull.Add(fullMon);
+                });
             }
+            // Get rid of duplicate moves
+            Queries.ReduceMoves(teamFull.ToArray());
             return teamFull;
         }
     }
