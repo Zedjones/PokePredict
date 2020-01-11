@@ -20,12 +20,14 @@ namespace PokePredict.Predict
         /// </summary>
         /// <param name="team">A list of PokemonDto objects to convert</param>
         /// <returns>A list of Pokemon objects with only the specified moves</returns>
-        public static List<Database.Models.Pokemon> DtoToFull(List<PokemonDto> team) {
+        public static List<Database.Models.Pokemon> DtoToFull(List<PokemonDto> team)
+        {
             var teamFull = new List<Database.Models.Pokemon>();
-            using (var db = new PokePredict.Database.Models.pokedexContext()) 
+            using (var db = new PokePredict.Database.Models.pokedexContext())
             {
                 var monQuery = Queries.AllPokemon(db);
-                team.ForEach(dtoMon => {
+                team.ForEach(dtoMon =>
+                {
                     // Get the specific Pokemon
                     var fullMon = monQuery.Where(pk => pk.Identifier == dtoMon.Name).First();
                     // Only get moves that are in our PokemonDto's list
