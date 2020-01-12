@@ -48,21 +48,25 @@ namespace PokePredict.Predict
             return null;
         }
 
-        public static Dictionary<string, int> GetDamageDone(Pokemon poke, ILogger<Controllers.PokemonController> logger, pokedexContext db)
+        public static Dictionary<string, long> GetDamageDone(Pokemon poke, ILogger<Controllers.PokemonController> logger, pokedexContext db)
         {
-            var damageDone = new Dictionary<string, int>();
+            var damageDone = new Dictionary<string, long>();
             foreach (var type in poke.PokemonTypes)
             {
                 var actualType = type.Type;
                 db.Entry(actualType)
                     .Collection(type => type.TypeEfficacyDamageType)
                     .Load();
-                db.Entry(actualType)
-                    .Collection(type => type.TypeEfficacyTargetType)
-                    .Load();
                 foreach (var damageRelation in actualType.TypeEfficacyDamageType)
                 {
                     logger.LogInformation(damageRelation.DamageFactor.ToString());
+                    var targetIden = damageRelation.TargetType.Identifier;
+                    if(!damageDone.ContainsKey(targetIden)) {
+                        damageDone[targetIden] = damageRelation.DamageFactor;
+                    }
+                    else {
+                        damageDone[targetIden] += damageRelation.DamageFactor;
+                    } 
                 }
             }
             return damageDone;
