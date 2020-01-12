@@ -192,7 +192,8 @@ namespace PokePredict.Database.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite("Data Source=pokedex.sqlite");
+                optionsBuilder
+                    .UseSqlite("Data Source=pokedex.sqlite");
             }
         }
 

@@ -41,7 +41,9 @@ namespace PokePredict.Database.Models
         public virtual ICollection<PokemonEvolution> PokemonEvolutionPartyType { get; set; }
         [JsonIgnore]
         public virtual ICollection<PokemonTypes> PokemonTypes { get; set; }
+        [JsonIgnore]
         public virtual ICollection<TypeEfficacy> TypeEfficacyDamageType { get; set; }
+        [JsonIgnore]
         public virtual ICollection<TypeEfficacy> TypeEfficacyTargetType { get; set; }
         public virtual ICollection<TypeGameIndices> TypeGameIndices { get; set; }
         public virtual ICollection<TypeNames> TypeNames { get; set; }

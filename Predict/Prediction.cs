@@ -1,6 +1,8 @@
 using PokePredict.Database;
+using PokePredict.Database.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace PokePredict.Predict
@@ -20,10 +22,10 @@ namespace PokePredict.Predict
         /// </summary>
         /// <param name="team">A list of PokemonDto objects to convert</param>
         /// <returns>A list of Pokemon objects with only the specified moves</returns>
-        public static List<Database.Models.Pokemon> DtoToFull(List<PokemonDto> team)
+        public static List<Pokemon> DtoToFull(List<PokemonDto> team)
         {
-            var teamFull = new List<Database.Models.Pokemon>();
-            using (var db = new PokePredict.Database.Models.pokedexContext())
+            var teamFull = new List<Pokemon>();
+            using (var db = new pokedexContext())
             {
                 var monQuery = Queries.AllPokemon(db);
                 team.ForEach(dtoMon =>
@@ -39,6 +41,31 @@ namespace PokePredict.Predict
             // Get rid of duplicate moves
             Queries.ReduceMoves(teamFull.ToArray());
             return teamFull;
+        }
+
+        public static Pokemon MatchPokemon(Pokemon poke)
+        {
+            return null;
+        }
+
+        public static Dictionary<string, int> GetDamageDone(Pokemon poke, ILogger<Controllers.PokemonController> logger, pokedexContext db)
+        {
+            var damageDone = new Dictionary<string, int>();
+            foreach (var type in poke.PokemonTypes)
+            {
+                var actualType = type.Type;
+                db.Entry(actualType)
+                    .Collection(type => type.TypeEfficacyDamageType)
+                    .Load();
+                db.Entry(actualType)
+                    .Collection(type => type.TypeEfficacyTargetType)
+                    .Load();
+                foreach (var damageRelation in actualType.TypeEfficacyDamageType)
+                {
+                    logger.LogInformation(damageRelation.DamageFactor.ToString());
+                }
+            }
+            return damageDone;
         }
     }
 }

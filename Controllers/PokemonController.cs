@@ -44,6 +44,7 @@ namespace PokePredict.Controllers
                 Queries.ReduceMoves(fullMon);
                 _logger.LogInformation(watch.Elapsed.ToString());
                 _logger.LogInformation(fullMon.PokemonMoves.Count.ToString());
+                Predict.Prediction.GetDamageDone(fullMon, _logger, db);
             }
 
             var jsSettings = new JsonSerializerSettings();
