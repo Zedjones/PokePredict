@@ -59,6 +59,9 @@ namespace PokePredict.Predict
                     .Load();
                 foreach (var damageRelation in actualType.TypeEfficacyDamageType)
                 {
+                    db.Entry(damageRelation)
+                        .Reference(relation => relation.TargetType)
+                        .Load();
                     logger.LogInformation(damageRelation.DamageFactor.ToString());
                     var targetIden = damageRelation.TargetType.Identifier;
                     if(!damageDone.ContainsKey(targetIden)) {
